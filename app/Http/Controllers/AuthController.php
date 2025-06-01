@@ -12,40 +12,36 @@ class AuthController extends Controller
 {
     // تسجيل الدخول
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email'    => 'required|email',
-            'password' => 'required|string|min:6',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email'    => 'required|email',
+        'password' => 'required|string|min:6',
+    ]);
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-    // النجاح
-        }
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-            $token = $user->createToken('authToken')->plainTextToken;
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Successful login',
-                'user'    => $user,
-                'token'   => $token
-            ]);
-        }
-
+    if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
         return response()->json([
             'status'  => false,
             'message' => 'Invalid credentials'
         ], 401);
     }
+
+    $user = Auth::user();
+    $token = $user->createToken('authToken')->plainTextToken;
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Successful login',
+        'user'    => $user,
+        'token'   => $token
+    ]);
+}
 
     // تسجيل مستخدم جديد
     public function register(Request $request)

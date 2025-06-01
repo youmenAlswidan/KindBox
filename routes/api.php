@@ -20,18 +20,24 @@ use App\Http\Controllers\Driver\DeliveryController;
 */
 
 
-
-
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user()->load('role');
+});
 
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-//Driver 
-Route::middleware(['auth:sanctum', 'role:driver'])->prefix('driver')->group(function () {
-    Route::get('/deliveries', [DeliveryController::class, 'index']);
-    Route::post('/deliveries/{id}/status', [DeliveryController::class, 'updateStatus']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+ // Driver routes
+    Route::middleware(['auth:sanctum', 'role:driver'])->prefix('driver')->group(function () {
+    Route::get('/deliveries', [DeliveryController::class, 'index']); // عرض الطلبات المخصصة له
+    Route::patch('/deliveries/{id}/status', [DeliveryController::class, 'updateStatus']); // تحديث حالة الطلب
+    Route::post('/location', [DeliveryController::class, 'updateLocation']); // اختيارية
+    Route::post('/deliveries/{id}/deliver', [DeliveryController::class, 'markAsDelivered']); // توصيل الطلب 
 });
 
 
