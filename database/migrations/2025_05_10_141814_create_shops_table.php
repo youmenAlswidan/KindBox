@@ -11,21 +11,22 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('shops', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('shop_name');
-            $table->string('image_shop')->nullable();
-            $table->text('discription_shop')->nullable();
-            $table->string('location');
-            $table->string('statues');
-            $table->string('phone_number');
-            $table->foreignId('category_id')->nullable()->constrained('categories');
-            $table->timestamps();
-        });
-    }
+   public function up()
+{
+    Schema::create('shops', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->string('shop_name');
+        $table->string('image_shop')->nullable();
+        $table->text('description_shop')->nullable();
+        $table->string('location')->nullable();
+        $table->string('phone_number')->nullable();
+        $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+        $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+        $table->timestamps();
+    });
+}
+
 
     /**
      * Reverse the migrations.

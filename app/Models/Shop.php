@@ -9,20 +9,20 @@ class Shop extends Model
 {
     use HasFactory;
 
-    // تحديد الأعمدة القابلة للتعبئة
+    
     protected $fillable = [
         'user_id',
         'shop_name',
         'image_shop',
-        'discription_shop',
+        'description_shop',
         'location',
-        'statues',
+        'status',
         'phone_number',
         'category_id',
     ];
 
     public function user() {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class );
     }
     
     public function category() {

@@ -33,7 +33,7 @@ class User extends Authenticatable
 
     public function shops()
     {
-        return $this->hasMany(Shop::class);
+         return $this->hasOne(Shop::class);
     }
 
     public function wishlists()

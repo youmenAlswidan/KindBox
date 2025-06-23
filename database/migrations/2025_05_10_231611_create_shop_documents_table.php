@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('shop_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shop_id')->constrained('shops');
-            $table->string('status');
+            $table->foreignId('shop_id')->constrained()->onDelete('cascade');
             $table->string('document_type');
             $table->string('file_path_document');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

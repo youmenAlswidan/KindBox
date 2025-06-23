@@ -7,68 +7,23 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 
 class AuthController extends Controller
 {
-    // تسجيل الدخول
-    public function login(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'email'    => 'required|email',
-        'password' => 'required|string|min:6',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-        return response()->json([
-            'status'  => false,
-            'message' => 'Invalid credentials'
-        ], 401);
-    }
-
-    $user = Auth::user();
-    $token = $user->createToken('authToken')->plainTextToken;
-
-    return response()->json([
-        'status'  => true,
-        'message' => 'Successful login',
-        'user'    => $user,
-        'token'   => $token
-    ]);
-}
-
-    // تسجيل مستخدم جديد
-    public function register(Request $request)
+   
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name'    => 'required|string|max:255',
-            'last_name'     => 'required|string|max:255',
-            'email'         => 'required|string|email|max:255|unique:users',
-            'password'      => 'required|string|min:6',
-            'phone_number'  => 'nullable|string',
-            'role_id'       => 'required|exists:roles,id'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $data = $request->validated();
 
         $user = User::create([
-            'first_name'   => $request->first_name,
-            'last_name'    => $request->last_name,
-            'email'        => $request->email,
-            'password'     => Hash::make($request->password),
-            'phone_number' => $request->phone_number,
-            'role_id'      => $request->role_id
+            'first_name'   => $data['first_name'],
+            'last_name'    => $data['last_name'],
+            'email'        => $data['email'],
+            'password'     => Hash::make($data['password']),
+            'phone_number' => $data['phone_number'] ?? null,
+            'role_id'      => $data['role_id'],
         ]);
 
         $token = $user->createToken('authToken')->plainTextToken;
@@ -79,16 +34,27 @@ class AuthController extends Controller
             'user'    => $user,
             'token'   => $token
         ], 201);
-
     }
-      
-        public function logout(Request $request)
-{
-    $request->user()->currentAccessToken()->delete();
 
-    return response()->json([
-        'message' => 'تم تسجيل الخروج بنجاح'
-    ]);
-}
+    public function login(LoginRequest $request)
+    {
+        $credentials = $request->validated();
 
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $user = Auth::user();
+        $token = $user->createToken('authToken')->plainTextToken;
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Successful login',
+            'user'    => $user,
+            'token'   => $token
+        ]);
+    }
 }

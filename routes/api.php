@@ -5,8 +5,11 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Driver\DeliveryController;
-
-
+use App\Http\Controllers\ShopManger\ShopController;
+use App\Http\Controllers\ShopManger\ShopDocumentController;
+use App\Http\Controllers\ShopManger\ProductController;
+use App\Http\Controllers\ShopManger\DiscountController;
+use App\Http\Controllers\ShopManger\GroupOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +23,11 @@ use App\Http\Controllers\Driver\DeliveryController;
 */
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user()->load('role');
-});
+
+
+
+ 
+  
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -41,4 +46,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 
+Route::middleware('auth:sanctum')->group(function () {
+
+   // Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Shop Manager routes
+    Route::resource('shops', ShopController::class);
+    Route::resource('shop-documents', ShopDocumentController::class);
+    Route::resource('products', ProductController::class);
+    Route::apiResource('discounts', DiscountController::class);
+    Route::apiResource('group-orders', GroupOrderController::class);
+});
 

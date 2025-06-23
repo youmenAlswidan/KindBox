@@ -1,26 +1,24 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-return new class extends Migration
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ShopDocument extends Model
 {
-    
-    public function up()
-    {
-        Schema::create('shop_documents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('shop_id')->constrained('shops');
-            $table->string('status');
-            $table->string('document_type');
-            $table->string('file_path_document');
-            $table->timestamps();
-        });
-    }
+    use HasFactory;
 
-   
-    public function shop() {
-        return $this->belongsTo(Shop::class);
-    }
-};
+     protected $fillable = [
+        'shop_id',
+        'document_type',
+        'file_path_document',
+        'status',
+       
+    ];
+    public function shop()
+{
+    return $this->belongsTo(Shop::class);
+}
+
+}
