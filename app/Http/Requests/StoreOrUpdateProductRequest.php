@@ -30,11 +30,17 @@ class StoreOrUpdateProductRequest extends FormRequest
         'description' => 'nullable|string',
         'price' => 'required|numeric|min:0',
         'image' => 'nullable|image|max:2048',
+        'discount_price' => 'nullable|numeric|lt:price',
+        'discount_start' => 'nullable|date',
+        'discount_end' => 'nullable|date|after_or_equal:discount_start',
+        'remove_discount' => 'nullable|boolean',
         'has_group_purchase' => 'nullable|boolean',
+        
     ];
  if ($this->input('has_group_purchase')) {
         $rules['group_price'] = 'required|numeric|min:0';
         $rules['group_min_users'] = 'required|integer|min:2';
+       $rules['dead_line'] = 'required|date|after:today'; 
     }
    
 

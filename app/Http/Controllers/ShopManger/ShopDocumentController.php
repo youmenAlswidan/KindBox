@@ -1,67 +1,61 @@
 <?php
 
 namespace App\Http\Controllers\ShopManger;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ShopDocument;
 use App\Models\Shop;
 use App\Http\Requests\StoreOrUpdateShopDocumentRequest;
-
+use App\Http\Resources\ShopDocumentResource;
 
 class ShopDocumentController extends Controller
 {
+    public function index()
+    {
+        $shop = Shop::where('user_id', auth()->id())->first();
 
-  public function index()
-{
-    $shop = Shop::where('user_id', auth()->id())->first();
+        if (!$shop) {
+            return response()->json(['message' => 'You do not have a shop yet.'], 404);
+        }
 
-if (!$shop) {
-    return response()->json(['message' => 'You do not have a shop yet.'], 404);
-}
+        $documents = $shop->documents;
 
-$documents = $shop->documents;
-
-return response()->json($documents);
-
-}
+        return ShopDocumentResource::collection($documents);
+    }
 
     public function store(StoreOrUpdateShopDocumentRequest $request)
-{
-    $user = auth()->user();
-    $shop = $user->shop; 
+    {
+        $shop = Shop::where('user_id', auth()->id())->first();
 
-    $shop = Shop::where('user_id', auth()->id())->first();
-if (!$shop) {
-    return response()->json([
-        'message' => 'You need to create a shop first.',
-        'user_id' => auth()->id(),
-    ]);
-}
+        if (!$shop) {
+            return response()->json([
+                'message' => 'You need to create a shop first.',
+                'user_id' => auth()->id(),
+            ]);
+        }
 
+        $filePath = $request->file('file_path_document')->store('shop_documents', 'public');
 
-    $filePath = $request->file('file_path_document')->store('shop_documents', 'public');
+        $document = ShopDocument::create([
+            'shop_id' => $shop->id,
+            'document_type' => $request->document_type,
+            'file_path_document' => $filePath,
+            'status' => 'pending',
+        ]);
 
-    $document = ShopDocument::create([
-        'shop_id' => $shop->id,
-        'document_type' => $request->document_type,
-        'file_path_document' => $filePath,
-        'status' => 'pending',
-    ]);
-
-    return response()->json([
-        'message' => 'The document has been uploaded and is awaiting admin review.',
-        'document' => $document,
-    ]);
-}
-
+        return response()->json([
+            'message' => 'The document has been uploaded and is awaiting admin review.',
+            'document' => new ShopDocumentResource($document),
+        ]);
+    }
 
     public function show($id)
     {
         $document = ShopDocument::findOrFail($id);
         $this->authorizeAccess($document);
 
-        return response()->json($document);
+        return new ShopDocumentResource($document);
     }
 
     public function update(StoreOrUpdateShopDocumentRequest $request, $id)
@@ -69,18 +63,16 @@ if (!$shop) {
         $document = ShopDocument::findOrFail($id);
         $this->authorizeAccess($document);
 
-       $document->update($request->only(['document_type']));
-
+        $document->update($request->only(['document_type']));
 
         if ($request->hasFile('file_path_document')) {
-    $filePath = $request->file('file_path_document')->store('shop_documents', 'public');
-    $document->update(['file_path_document' => $filePath]);
-}
-
+            $filePath = $request->file('file_path_document')->store('shop_documents', 'public');
+            $document->update(['file_path_document' => $filePath]);
+        }
 
         return response()->json([
             'message' => 'The document was updated successfully.',
-            'document' => $document,
+            'document' => new ShopDocumentResource($document),
         ]);
     }
 
@@ -94,7 +86,6 @@ if (!$shop) {
         return response()->json(['message' => 'The document was deleted successfully.']);
     }
 
-    
     protected function authorizeAccess(ShopDocument $document)
     {
         if ($document->shop->user_id !== auth()->id()) {

@@ -29,12 +29,12 @@ class Product extends Model
         return $this->belongsTo(Shop::class);
     }
     
-    public function discounts() {
-        return $this->hasMany(Discount::class);
+    public function discount() {
+        return $this->hasOne(Discount::class);
     }
     
     public function groupOrders() {
-        return $this->hasMany(GroupOrder::class);
+        return $this->hasOne(GroupOrder::class);
     }
     
     public function wishlists() {

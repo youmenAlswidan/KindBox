@@ -60,4 +60,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Vehicle::class);
     }
+
+    public function chatHistories()
+{
+    return $this->hasMany(ChatHistory::class);
+}
+
 }
