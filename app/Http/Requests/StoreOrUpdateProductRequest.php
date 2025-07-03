@@ -41,7 +41,7 @@ class StoreOrUpdateProductRequest extends FormRequest
                 'has_group_purchase' => 'sometimes|boolean',
             ];
 
-            // خصائص الخصم فقط في التعديل
+            
             if ($this->hasAny(['discount_price', 'discount_start', 'discount_end'])) {
                 $rules['discount_price'] = 'nullable|numeric|lt:price';
                 $rules['discount_start'] = 'nullable|date';
