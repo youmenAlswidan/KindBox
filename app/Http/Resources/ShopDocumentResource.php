@@ -15,8 +15,8 @@ class ShopDocumentResource extends JsonResource
     public function toArray( $request): array
     {
         return [
-            'id' => $this->id,
-            'shop_id' => $this->shop_id,
+            
+            
             'document_type' => $this->document_type,
             'file_url' => asset('storage/' . $this->file_path_document),
             'status' => $this->status,

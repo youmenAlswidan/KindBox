@@ -12,6 +12,12 @@ use App\Http\Controllers\ShopManger\DiscountController;
 use App\Http\Controllers\ShopManger\GroupOrderController;
 use App\Http\Controllers\ChatController;
 
+
+
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -57,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('discounts', DiscountController::class);
     Route::apiResource('group-orders', GroupOrderController::class);
 });
+  
 
  
   
@@ -65,3 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat', [ChatController::class, 'chat']);
     Route::get('/chat/history', [ChatController::class, 'history']);
 });
+
+
+
+
+

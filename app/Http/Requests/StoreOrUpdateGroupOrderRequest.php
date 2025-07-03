@@ -23,18 +23,32 @@ class StoreOrUpdateGroupOrderRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
-    {
-          return [
-            'product_id' => 'required|exists:products,id',
-            'status' => 'required|in:open,closed',
-            'current_user_count' => 'required|integer|min:0',
-            'require_user_count' => 'required|integer|min:1',
-            'dead_line' => 'required|date|after_or_equal:today',
-        ];
-                       
+   public function rules(): array
+{
+    // القواعد الأساسية بلا "required"
+    $rules = [
+        'product_id'         => 'exists:products,id',
+        'status'             => 'in:open,closed',
+        'current_user_count' => 'integer|min:0',
+        'require_user_count' => 'integer|min:1',
+        'dead_line'          => 'date|after_or_equal:today',
+    ];
 
-     
-    
+    // إذا كان الطلب POST → اجعل كل شيء مُلزِم
+    if ($this->isMethod('post')) {
+        foreach ($rules as $field => $rule) {
+            $rules[$field] = "required|$rule";
+        }
     }
+
+    // إذا كان PUT أو PATCH → أضف "sometimes|" لنجعلها اختيارية
+    if ($this->isMethod('put') || $this->isMethod('patch')) {
+        foreach ($rules as $field => $rule) {
+            $rules[$field] = "sometimes|$rule";
+        }
+    }
+
+    return $rules;
+}
+
 }

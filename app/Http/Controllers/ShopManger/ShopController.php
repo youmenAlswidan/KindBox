@@ -35,8 +35,11 @@ class ShopController extends Controller
         }
 
         $validated['user_id'] = auth()->id();
+       
 
         $shop = Shop::create($validated);
+        $shop->refresh();
+
 
         return response()->json([
             'message' => 'The shop has been created successfully and is awaiting document verification.',
@@ -80,7 +83,6 @@ class ShopController extends Controller
 
         return response()->json([
             'message' => 'Update successfuly',
-            'updated_data' => $validated,
             'shop_now' => new ShopResource($shop),
         ]);
     }

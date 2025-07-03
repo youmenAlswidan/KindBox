@@ -145,33 +145,44 @@ public function update(StoreOrUpdateProductRequest $request, Product $product)
 
    
     if ($product->has_group_purchase) {
-        $groupOrder = $product->groupOrders()->first();
-        if ($groupOrder) {
-            $groupOrder->update([
-                'require_user_count' => $product->group_min_users,
-                'dead_line' => $request->input('dead_line'),
-            ]);
-        } else {
-            GroupOrder::create([
-                'product_id' => $product->id,
-                'status' => 'open',
-                'current_user_count' => 0,
-                'require_user_count' => $product->group_min_users,
-                'dead_line' => $request->input('dead_line'),
-            ]);
+    $groupOrder = $product->groupOrders()->first();
+    
+    $deadLine = $request->input('dead_line', $groupOrder?->dead_line);
+
+    if (!$deadLine) {
+        return response()->json([
+            'success' => false,
+            'message' => 'The group purchase deadline is required.',
+        ], 422);
+    }
+
+    if ($groupOrder) {
+        $groupOrder->update([
+            'require_user_count' => $product->group_min_users,
+            'dead_line' => $deadLine,
+        ]);
+    } else {
+        GroupOrder::create([
+            'product_id' => $product->id,
+            'status' => 'open',
+            'current_user_count' => 0,
+            'require_user_count' => $product->group_min_users,
+            'dead_line' => $deadLine,
+        ]);
+ 
             
         }
 
         
     } 
     else {
-    // ❗️هنا الحل: احذف القيم من الأعمدة في المنتج نفسه
+  
     $product->update([
         'group_price' => null,
         'group_min_users' => null,
     ]);
 
-    $product->groupOrders()->delete(); // حذف group orders
+    $product->groupOrders()->delete(); 
 }
 
   

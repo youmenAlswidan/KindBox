@@ -10,7 +10,6 @@ class ShopResource extends JsonResource
     public function toArray( $request): array
     {
         return [
-            'id' => $this->id,
             'shop_name' => $this->shop_name,
             'image_url' => $this->image_shop ? asset('storage/' . $this->image_shop) : null,
             'description' => $this->description_shop,
@@ -22,4 +21,3 @@ class ShopResource extends JsonResource
         ];
     }
 }
-
