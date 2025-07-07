@@ -24,24 +24,36 @@ class Product extends Model
     public function category() {
         return $this->belongsTo(Category::class);
     }
-    
+
     public function shop() {
         return $this->belongsTo(Shop::class);
     }
-    
-    public function discount() {
-        return $this->hasOne(Discount::class);
-    }
-    
+
+       public function discount()
+{
+    // نجيب الخصم الساري فقط
+    return $this->hasOne(Discount::class)
+        ->whereDate('start_date', '<=', now())
+        ->whereDate('end_date', '>=', now());
+}
+
     public function groupOrders() {
         return $this->hasOne(GroupOrder::class);
     }
-    
+
     public function wishlists() {
         return $this->hasMany(Wishlist::class);
     }
-    
+
     public function orderItems() {
         return $this->hasMany(OrderItem::class);
     }
+
+
+    public function ratings() {
+    return $this->hasMany(Rating::class);
+}
+
+
+
 }

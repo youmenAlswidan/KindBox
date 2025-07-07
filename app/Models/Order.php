@@ -15,24 +15,25 @@ class Order extends Model
         'total_quantity',
         'group_orders_id',
         'status',
+        'split_option',
     ];
 
     public function user() {
         return $this->belongsTo(User::class);
     }
-    
+
     public function groupOrder() {
         return $this->belongsTo(GroupOrder::class, 'group_orders_id');
     }
-    
+
     public function items() {
         return $this->hasMany(OrderItem::class);
     }
-    
+
     public function payment() {
         return $this->hasOne(Payment::class);
     }
-    
+
     public function delivery() {
         return $this->hasMany(Delivery::class);
     }
